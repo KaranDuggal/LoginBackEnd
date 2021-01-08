@@ -8,7 +8,6 @@ module.exports = UserController = function () {
     this.user_signup = async (req, res) => {
         try {
             let existingUser = await userService.check_email_exist(req.body.email);
-
             if (existingUser === true) { throw { custom_err_message: "User Already Exists" } }
             // ==================================================================================
             const validate = await validatorService.schemas.signupSchema.validate(req.body)
@@ -27,6 +26,18 @@ module.exports = UserController = function () {
     }
 
     this.user_login = async (req, res) => {
-        res.send('login')
+        try {
+            const validate = await validatorService.schemas.loginScema.validate(req.body);
+            // ==================================================================================
+            let User = await userService.check_email_exist_send_Data(req.body.email);
+            // ==================================================================================
+            const password = await bcrypt.compare(req.body.password, User.password)
+            if (password === false) { throw { custom_err_message: "wrong password" } }
+            // ==================================================================================
+            return res.status(200).json({ success: true, message: `Loged In Successfully`, data: "existingUser" });
+        } catch (err) {
+            console.log(`err at user_login ${err}`);
+            return res.status(400).json({ success: false, message: err.custom ? err.custom.message : `Couldn't login. Please try again later.`, error: err })
+        }
     }
 }

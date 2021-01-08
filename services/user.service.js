@@ -30,6 +30,17 @@ class UserController {
             }
         })
     }
-
+    check_email_exist_send_Data(email) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const emailexist = await dbService.findOne(singupuser, { email: email }).catch(err => {
+                    throw err
+                })
+                resolve((emailexist && emailexist !== null) ? emailexist : false)
+            } catch (err) {
+                reject(err)
+            }
+        })
+    }
 }
 module.exports = UserController;
