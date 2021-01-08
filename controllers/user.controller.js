@@ -3,6 +3,8 @@ const UserService = require('../services/user.service')
 const userService = new UserService();
 const ValidatorService = require('../services/validator.service')
 const validatorService = new ValidatorService()
+const NodeMailer = require('../services/sendmail.service')
+const nodemailer = new NodeMailer()
 
 module.exports = UserController = function () {
     this.user_signup = async (req, res) => {
@@ -11,9 +13,8 @@ module.exports = UserController = function () {
             if (existingUser === true) { throw { custom_err_message: "User Already Exists" } }
             // ==================================================================================
             const validate = await validatorService.schemas.signupSchema.validate(req.body)
-            if (existingUser.error) { throw { custom_err_message: "error in validatorService.schemas.signupSchema" } }
+            if (validate.error) { throw { custom_err_message: "error in validatorService.schemas.signupSchema", error: validate.error.details } }
             // ==================================================================================
-            console.log(validate.value.password);
             let hashedPassword = await bcrypt.hash(validate.value.password, 10);
             validate.value.password = hashedPassword;
             const user = await userService.signup(validate.value);
@@ -27,6 +28,9 @@ module.exports = UserController = function () {
 
     this.user_login = async (req, res) => {
         try {
+            // ==================================Nodemailer======================================
+            await nodemailer.sendmail()
+            // ==================================================================================
             const validate = await validatorService.schemas.loginScema.validate(req.body);
             // ==================================================================================
             let User = await userService.check_email_exist_send_Data(req.body.email);
@@ -34,7 +38,8 @@ module.exports = UserController = function () {
             const password = await bcrypt.compare(req.body.password, User.password)
             if (password === false) { throw { custom_err_message: "wrong password" } }
             // ==================================================================================
-            return res.status(200).json({ success: true, message: `Loged In Successfully`, data: "existingUser" });
+            const token = await userService.createUserToken(User);
+            return res.status(200).json({ success: true, message: `Loged In Successfully`, data: User, token: token });
         } catch (err) {
             console.log(`err at user_login ${err}`);
             return res.status(400).json({ success: false, message: err.custom ? err.custom.message : `Couldn't login. Please try again later.`, error: err })

@@ -1,8 +1,9 @@
-const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken');
+
 const DBService = require('./db.service');
 const dbService = new DBService();
 const singupuser = require('../models/user.models');
-
+const config = require('../configurations/config')
 class UserController {
     constructor() { }
     check_email_exist(email) {
@@ -39,6 +40,20 @@ class UserController {
                 resolve((emailexist && emailexist !== null) ? emailexist : false)
             } catch (err) {
                 reject(err)
+            }
+        })
+    }
+    createUserToken(data) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                console.log(data);
+                const token = jwt.sign({
+                    email: data.email,
+                    userId: data._id,
+                }, config.jwtSecret, { expiresIn: '1h' })
+                resolve(token);
+            } catch (err) {
+                reject(err);
             }
         })
     }

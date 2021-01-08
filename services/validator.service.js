@@ -10,8 +10,8 @@ class ValidatorService {
         this.schemas.signupSchema = Joi.object({
             firstname: Joi.string().required(),
             lastname: Joi.string(),
-            email: Joi.string().required(),
-            password: Joi.string().required(),
+            email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
+            password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{8,30}$')),
             age: Joi.number(),
             date: Joi.date(),
             gender: Joi.string(),
