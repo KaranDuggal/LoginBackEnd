@@ -9,6 +9,7 @@ const nodemailer = new NodeMailer()
 module.exports = UserController = function () {
     this.user_signup = async (req, res) => {
         try {
+            console.log('hello');
             let existingUser = await userService.check_email_exist(req.body.email);
             if (existingUser === true) { throw { custom_err_message: "User Already Exists" } }
             // ==================================================================================
