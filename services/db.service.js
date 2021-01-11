@@ -24,6 +24,28 @@ class DBService {
             });
         });
     }
+    findMany(collection) {
+        return new Promise((resolve, reject) => {
+            collection.find().exec((err, data) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(data);
+                }
+            })
+        });
+    }
+    deleteOne(collection, deletequery) {
+        return new Promise((resolve, reject) => {
+            collection.findOneAndDelete(deletequery, (err, data) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(data);
+                }
+            })
+        })
+    }
 }
 
 module.exports = DBService;

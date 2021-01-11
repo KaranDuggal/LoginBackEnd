@@ -57,5 +57,31 @@ class UserController {
             }
         })
     }
+    get_all_users() {
+        return new Promise(async (resolve, reject) => {
+            try {
+                console.log('in get all users First call');
+                const users = await dbService.findMany(singupuser).catch(err => {
+                    throw err
+                })
+                resolve((users && users  !== null) ? users : false)
+            } catch (err) {
+                reject(err)
+            }
+        })
+    }
+    delete_user(deletequery) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const user = await dbService.deleteOne(singupuser, deletequery);
+                resolve(user);
+                return
+            }
+            catch (err) {
+                reject(err);
+                return
+            }
+        })
+    }
 }
 module.exports = UserController;

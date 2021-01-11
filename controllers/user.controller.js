@@ -46,4 +46,38 @@ module.exports = UserController = function () {
             return res.status(400).json({ success: false, message: err.custom ? err.custom.message : `Couldn't login. Please try again later.`, error: err })
         }
     }
+    this.get_all_users = async (req, res) => {
+        try {
+            console.log('in getallusers');
+            const users = await userService.get_all_users();
+            return res.status(200).json({ success: true, message: `All Users`, data: users });
+        } catch (err) {
+            console.log(err);
+            return res.status(400).json({ success: false, message: err.custom ? err.custom.message : `error in usersget route`, error: err })
+        }
+    }
+    this.edit_user = async (req, res) => {
+        try {
+            console.log('in getallusers');
+            const users = await userService.get_all_users();
+            return res.status(200).json({ success: true, message: `All Users`, data: users });
+        } catch (err) {
+            console.log(err);
+            return res.status(400).json({ success: false, message: err.custom ? err.custom.message : `error in usersget route`, error: err })
+        }
+    }
+    this.delete_user = async (req, res) => {
+        try {
+            console.log('in delete');
+            let deleteuser = await userService.delete_user(req.params.id);
+            console.log('deleteuser:', deleteuser)
+            if (deleteuser === false) { throw { custom_err_message: "User Already deleted" } }
+            // ==================================================================================
+            return res.status(200).json({ success: true, message: `user deleted successfully.`, data: deleteuser });
+        } catch (err) {
+            console.log("error in delete part", err);
+            return res.status(400).json({ success: false, error: err, message: err.custom_err_message ? err.custom_err_message : "Could not Signup" });
+        }
+    }
+
 }
